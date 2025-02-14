@@ -1,0 +1,63 @@
+name: Build and Deploy Unity WebGL
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_projects: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get Changed Unity Projects
+        id: filter
+        run: |
+          changed_folders=$(git diff --name-only HEAD^ HEAD | awk -F '/' '{print $1}' | sort -u | uniq)
+          json=$(echo "$changed_folders" | jq -R -s -c 'split("\n")[:-1]')
+          echo "Changes detected: $json"
+          echo "changes=$json" >> "$GITHUB_OUTPUT"
+
+  build-and-deploy:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.detect-changes.outputs.changed_projects != '[]' }}
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.detect-changes.outputs.changed_projects) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract Unity Version
+        id: unity_version
+        run: |
+          UNITY_VERSION=$(grep "m_EditorVersion:" ${{ matrix.project }}/ProjectSettings/ProjectVersion.txt | cut -d ' ' -f 2)
+          echo "Detected Unity Version: $UNITY_VERSION"
+          echo "UNITY_VERSION=$UNITY_VERSION" >> "$GITHUB_ENV"
+
+      - name: Setup Unity
+        uses: game-ci/unity-builder@v2
+        with:
+          targetPlatform: WebGL
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ matrix.project }}
+
+      - name: Build WebGL
+        run: |
+          mkdir -p build/${{ matrix.project }}
+          unity-editor -batchmode -quit -nographics -buildTarget WebGL -projectPath ${{ matrix.project }} -executeMethod UnityEditor.BuildPipeline.BuildPlayer -logFile build_log.txt
+          mv ${{ matrix.project }}/Build/WebGL/* build/${{ matrix.project }}/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build
+          destination_dir: builds
+          keep_files: true
