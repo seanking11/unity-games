@@ -15,14 +15,14 @@ jobs:
       matrix:
         project: [
             "Udemy Day 2 - Carrot Collector",
-            "Udemy Day 3 - 3D Dodging",
-            "Udemy Day 4 - Balloon Popper",
-            "Udemy Day 5 - Block Dodger",
-            "Udemy Day 6 - 3D Maze Ball",
-            "Udemy Day 7 - Cube Runner",
+            # "Udemy Day 3 - 3D Dodging",
+            # "Udemy Day 4 - Balloon Popper",
+            # "Udemy Day 5 - Block Dodger",
+            # "Udemy Day 6 - 3D Maze Ball",
+            # "Udemy Day 7 - Cube Runner",
             # "Udemy Day 8 - Monetize Ads",
-            "Udemy Day 9 - Coin Collector",
-            "Udemy Day 10 - 2D Essentials",
+            # "Udemy Day 9 - Coin Collector",
+            # "Udemy Day 10 - 2D Essentials",
           ]
     steps:
       - name: Checkout repository
@@ -53,9 +53,9 @@ jobs:
       - name: Build WebGL
         if: steps.cache-build.outputs.cache-hit != 'true' # Only build if cache is invalid
         run: |
-          mkdir -p build/${{ matrix.project }}
-          unity-editor -batchmode -quit -nographics -buildTarget WebGL -projectPath ${{ matrix.project }} -executeMethod UnityEditor.BuildPipeline.BuildPlayer -logFile build_log.txt
-          mv ${{ matrix.project }}/Build/WebGL/* build/${{ matrix.project }}/
+          mkdir -p "build/${{ matrix.project }}"
+          unity-editor -batchmode -quit -nographics -buildTarget WebGL -projectPath "${{ matrix.project }}" -executeMethod UnityEditor.BuildPipeline.BuildPlayer -logFile build_log.txt
+          mv "${{ matrix.project }}/Build/WebGL/"* "build/${{ matrix.project }}/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
