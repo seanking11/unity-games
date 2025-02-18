@@ -33,7 +33,8 @@ jobs:
       - name: Extract Unity Version
         id: unity_version
         run: |
-          UNITY_VERSION=$(grep "m_EditorVersion:" ${{ matrix.project }}/ProjectSettings/ProjectVersion.txt | cut -d ' ' -f 2)
+          project_path="${{ matrix.project }}"
+          UNITY_VERSION=$(grep "m_EditorVersion:" "$project_path/ProjectSettings/ProjectVersion.txt" | cut -d ' ' -f 2)
           echo "Detected Unity Version: $UNITY_VERSION"
           echo "UNITY_VERSION=$UNITY_VERSION" >> "$GITHUB_ENV"
 
