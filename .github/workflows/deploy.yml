@@ -15,11 +15,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2 # Ensures we can use `HEAD^`
 
       - name: Get Changed Unity Projects
         id: filter
         run: |
-          changed_folders=$(git diff --name-only HEAD^ HEAD | awk -F '/' '{print $1}' | sort -u | uniq)
+          changed_folders=$(git diff --name-only HEAD^ HEAD -- */ProjectSettings/ProjectVersion.txt | awk -F '/' '{print $1}' | sort -u | uniq)
           json=$(echo "$changed_folders" | jq -R -s -c 'split("\n")[:-1]')
           echo "Changes detected: $json"
           echo "changes=$json" >> "$GITHUB_OUTPUT"
