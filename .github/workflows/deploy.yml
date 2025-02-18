@@ -30,14 +30,6 @@ jobs:
         with:
           fetch-depth: 0 # Ensure we get full commit history
 
-      - name: Extract Unity Version
-        id: unity_version
-        run: |
-          project_path="${{ matrix.project }}"
-          UNITY_VERSION=$(grep "m_EditorVersion:" "$project_path/ProjectSettings/ProjectVersion.txt" | cut -d ' ' -f 2)
-          echo "Detected Unity Version: $UNITY_VERSION"
-          echo "UNITY_VERSION=$UNITY_VERSION" >> "$GITHUB_ENV"
-
       # Restore cached build if no changes
       - name: Restore Cached Build
         id: cache-build
@@ -57,7 +49,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
-          unityVersion: ${{ env.UNITY_VERSION }}
+          unityVersion: auto
           projectPath: ${{ matrix.project }}
 
       - name: Build WebGL
