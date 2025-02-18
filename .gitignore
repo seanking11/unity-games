@@ -6,7 +6,4 @@ Temp/
 UserSettings/
 Packages/*
 !Packages/manifest.json
-ProjectSettings/
-# Used for CI/CD to grab Unity Version
-!ProjectSettings/ProjectVersion.txt
 Builds/
