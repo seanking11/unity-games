@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Unity Day 3 - 3D Dodging.sln"
+    "dotnet.defaultSolution": "Udemy Day 3 - 3D Dodging.sln"
 }
