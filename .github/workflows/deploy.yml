@@ -11,24 +11,22 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        project:
-          [
+        project: [
             "Udemy Day 2 - Carrot Collector",
             "Udemy Day 3 - 3D Dodging",
             "Udemy Day 4 - Balloon Popper",
             "Udemy Day 5 - Block Dodger",
             "Udemy Day 6 - 3D Maze Ball",
             "Udemy Day 7 - Cube Runner",
-            "Udemy Day 8 - Monetize Ads",
+            # "Udemy Day 8 - Monetize Ads",
             "Udemy Day 9 - Coin Collector",
             "Udemy Day 10 - 2D Essentials",
           ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Ensure we get full commit history
 
       # Restore cached build if no changes
       - name: Restore Cached Build
