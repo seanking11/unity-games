@@ -49,13 +49,12 @@ jobs:
           targetPlatform: WebGL
           unityVersion: auto
           projectPath: ${{ matrix.project }}
-          outputPath: build/${{ matrix.project }}
 
       - name: Upload WebGL Build
         uses: actions/upload-artifact@v4
         with:
           name: WebGL-${{ matrix.project }}
-          path: build/${{ matrix.project }}
+          path: build
           if-no-files-found: error
           overwrite: true
 
