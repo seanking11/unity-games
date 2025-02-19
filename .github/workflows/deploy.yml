@@ -43,19 +43,18 @@ jobs:
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
           unityVersion: auto
           projectPath: ${{ matrix.project }}
+          outputPath: build/${{ matrix.project }}
 
-      - name: Build WebGL
-        if: steps.cache-build.outputs.cache-hit != 'true' # Only build if cache is invalid
-        run: |
-          mkdir -p "build/${{ matrix.project }}"
-          unity-editor -batchmode -quit -nographics -buildTarget WebGL -projectPath "${{ matrix.project }}" -executeMethod UnityEditor.BuildPipeline.BuildPlayer -logFile build_log.txt
-          mv "${{ matrix.project }}/Build/WebGL/"* "build/${{ matrix.project }}/"
+      # Upload the built WebGL files as an artifact for later deployment
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: WebGL-${{ matrix.project }}
+          path: build/${{ matrix.project }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
