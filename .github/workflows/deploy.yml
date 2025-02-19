@@ -49,12 +49,13 @@ jobs:
           projectPath: ${{ matrix.project }}
           outputPath: build/${{ matrix.project }}
 
-      # Upload the built WebGL files as an artifact for later deployment
       - name: Upload WebGL Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: WebGL-${{ matrix.project }}
           path: build/${{ matrix.project }}
+          if-no-files-found: error
+          overwrite: true
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
