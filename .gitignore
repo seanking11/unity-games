@@ -6,5 +6,4 @@ Temp/
 UserSettings/
 Packages/*
 !Packages/manifest.json
-ProjectSettings/
 Builds/

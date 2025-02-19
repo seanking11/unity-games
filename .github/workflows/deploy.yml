@@ -1,0 +1,66 @@
+name: Build and Deploy Unity WebGL Games
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [
+            "Udemy Day 2 - Carrot Collector",
+            # "Udemy Day 3 - 3D Dodging",
+            # "Udemy Day 4 - Balloon Popper",
+            # "Udemy Day 5 - Block Dodger",
+            # "Udemy Day 6 - 3D Maze Ball",
+            # "Udemy Day 7 - Cube Runner",
+            # "Udemy Day 8 - Monetize Ads",
+            # "Udemy Day 9 - Coin Collector",
+            # "Udemy Day 10 - 2D Essentials",
+          ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Restore cached build if no changes
+      - name: Restore Cached Build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          path: ${{ matrix.project }}/Library
+          key: Library-WebGL-${{ matrix.project }}-${{ hashFiles('**/${{ matrix.project }}/Assets/**', '**/${{ matrix.project }}/ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-${{ matrix.project }}-
+
+      - name: Setup Unity
+        if: steps.cache-build.outputs.cache-hit != 'true' # Only setup Unity if no cache hit
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: WebGL
+          unityVersion: auto
+          projectPath: ${{ matrix.project }}
+
+      - name: Upload WebGL Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebGL-${{ matrix.project }}
+          path: build
+          if-no-files-found: error
+          overwrite: true
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          publish_dir: build
+          destination_dir: builds
+          keep_files: true
